@@ -8,6 +8,7 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/
 
 # Generated files
 .idea/**/contentModel.xml
@@ -585,6 +586,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv2/
 env/
 venv/
 ENV/

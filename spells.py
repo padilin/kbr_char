@@ -64,6 +64,12 @@ class Quality:
         else:
             return self.x
 
+    def __repr__(self):
+        return self.desc
+
+    def __str__(self):
+        return self.__repr__()
+
 
 @dataclass
 class Spell:
@@ -71,6 +77,8 @@ class Spell:
     qualities: list[Quality] = field(default_factory=list)
 
     _dc: int = 0
+    _desc: str = None
+    _order: list[str] = field(default_factory=list)
 
     @property
     def dc(self):
@@ -86,7 +94,29 @@ class Spell:
         self.qualities.append(_quality)
 
     def process_desc(self):
-        return f"{self.name} with a dc of {self.dc}"
+        _desc = ""
+        elements_qualities = self.get_qualities(category="Elements")
+        range_qualities = self.get_qualities(category="Range")
+        shape_qualities = self.get_qualities(category="Shape")
+        modifiers_qualities = self.get_qualities(category="Modifiers")
+        misc_qualities = list()
+        misc_categories = list([x for x in self._order if x not in ["Elements", "Range", "Shape", "Modifiers"]])
+        _desc = self.name.title() + " with a dc of " + str(self.dc) + " : " + " and ".join(self._return_desc(elements_qualities)) + " is a " + " and ".join(self._return_desc(range_qualities)) + " spell that is a " + " and ".join(self._return_desc(shape_qualities))
+        if modifiers_qualities:
+            _desc = _desc + " that " + " and ".join(self._return_desc(modifiers_qualities))
+        if misc_qualities:
+            _desc = _desc + " " + " and ".join(self._return_desc(misc_qualities))
+        self._desc = _desc
+        return self._desc
+
+    def _return_desc(self, qualities: list[Quality]) -> list[str]:
+        result = list()
+        for item in qualities:
+            _desc = item.desc
+            if item.units:
+                _desc = _desc + " of " + str(item.x) + " " + item.units
+            result.append(_desc)
+        return result
 
     def get_qualities(self, name: str = None, category: str = None) -> list[Quality]:
         if name:
@@ -95,6 +125,12 @@ class Spell:
             return list([x for x in self.qualities if x.catagory == category])
         else:
             return self.qualities
+
+    def __repr__(self):
+        return self.process_desc()
+
+    def __str__(self):
+        return self.__repr__()
 
 
 @dataclass
@@ -145,6 +181,7 @@ class SpellFactory:
 
     def create_spell(self, name: str) -> Spell:
         spell = Spell(name)
+        spell._order = self.order
         self.spells.append(spell)
         return spell
 

@@ -56,7 +56,6 @@ class Quality:
     units: str = None
     formula: str = "x" # Formula defaults to passing in value to x, to allow easy defining no formula qualities
 
-
     @property
     def dc(self):
         if self.formula:
@@ -89,12 +88,20 @@ class Spell:
     def process_desc(self):
         return f"{self.name} with a dc of {self.dc}"
 
+    def get_qualities(self, name: str = None, category: str = None) -> list[Quality]:
+        if name:
+            return list([x for x in self.qualities if x.name == name])
+        elif category:
+            return list([x for x in self.qualities if x.catagory == category])
+        else:
+            return self.qualities
 
 
 @dataclass
 class SpellFactory:
     quality_config: dict[str, str] | str = field(default_factory=dict)
     spells: list[Spell] =  field(default_factory=list)
+    order: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         self.qualities = self.load_qualities(self.quality_config)
@@ -131,6 +138,7 @@ class SpellFactory:
         if isinstance(_json, dict):
             data = _json
         for k, v in data.items():
+            self.order.append(k)
             for quality in v:
                 results.append(Quality(**quality, catagory=k))
         return results
@@ -165,6 +173,8 @@ if __name__ == "__main__":
     Fireball = Codex2.create_spell("fireball")
     print("combustion")
     Fireball.add_quality(Codex2.Combustion)
+    print("blast")
+    Fireball.add_quality(Codex2.Blast)
     print("range")
     Fireball.add_quality(Codex2.SpellRange, 100)
     print("arrow")
@@ -173,3 +183,5 @@ if __name__ == "__main__":
     Fireball.add_quality(Codex2.EffectDistance, 20)
     print(f"{Fireball=}")
     print(f"{Fireball.name} with a dc of {Fireball.dc}")
+
+    print(Fireball.get_qualities(category="Elements"))

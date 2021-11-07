@@ -50,6 +50,7 @@ class Quality:
     _formula: str = None
 
     # optional
+    desc: str = None
     catagory: str = None
     sub: str = None
     units: str = None

@@ -15,6 +15,7 @@ _OP_MAP = {
     ast.Mult: operator.mul,
     ast.Div: operator.truediv,
     ast.Invert: operator.neg,
+    ast.Pow: operator.pow,
 }
 
 
@@ -41,6 +42,17 @@ class Calc(ast.NodeVisitor):
 
 @dataclass()
 class Quality:
+    """
+    Class that holds the data for the different spell qualities.
+    :param str name: Name of quality
+    :param int x: Numeric value of quality
+    :param str spell_name: Name of attached spell
+    :param str desc: Part that gets built into spell description
+    :param str catagory: Overarching catagory this belongs to
+    :param str sub: Sub-type of element
+    :param str units: Units of value, ex: ft, mi, in
+    :param str formula: Representation of formula, value substitute for x
+    """
     # required
     name: str
     x: int
@@ -57,7 +69,11 @@ class Quality:
     formula: str = "x" # Formula defaults to passing in value to x, to allow easy defining no formula qualities
 
     @property
-    def dc(self):
+    def dc(self) -> int:
+        """
+        :return: Return difficulty of quality.
+        :rtype: int
+        """
         if self.formula:
             self._formula = self.formula.replace("x", str(self.x))
             return int(Calc.evaluate(self._formula))
@@ -73,6 +89,12 @@ class Quality:
 
 @dataclass
 class Spell:
+    """
+    Class that holds a single spell and all of its attributes.
+    :param str name: Name of spell
+    :param qualities: A list of qualities
+    :type: list(Quality)
+    """
     name: str
     qualities: list[Quality] = field(default_factory=list)
 
@@ -81,19 +103,29 @@ class Spell:
     _order: list[str] = field(default_factory=list)
 
     @property
-    def dc(self):
+    def dc(self) -> int:
+        """
+        :return: Return difficulty of spell.
+        :rtype: int
+        """
         self._dc = 0
         for quality in self.qualities:
             self._dc += quality.dc
         return self._dc
 
-    def add_quality(self, quality: Quality, value: int = None):
+    def add_quality(self, quality: Quality, value: int = None) -> None:
+        """
+        :param quality: Takes a quality, processes it, adds it to self.
+        :type: Quality
+        :param value: Takes in the numeric value, 'x', of a quality.
+        :type: int
+        """
         _quality = quality
         if value:
             _quality.x = value
         self.qualities.append(_quality)
 
-    def process_desc(self):
+    def process_desc(self) -> str:
         _desc = ""
         elements_qualities = self.get_qualities(category="Elements")
         range_qualities = self.get_qualities(category="Range")

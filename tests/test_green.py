@@ -2,14 +2,9 @@ import operator
 
 import pytest
 from kbr_char.green import (
-    Modifier,
     load_data,
     SpellComponentCollection,
     Spell,
-    Element,
-    Range,
-    Shape,
-    SpellComponent,
     SpellBook,
     Calc,
 )
@@ -18,43 +13,39 @@ from kbr_char.green import (
 class TestSpellComponentCollections:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
+        test_data = load_data("kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
-    def test_retrieving_a_component(self):
-        spell_component = self.spell_components.get_component(Element, "Combustion")
+    def test_retrieving_an_element(self):
+        spell_component = self.spell_components.get_element("Combustion")
         assert spell_component.name == "Combustion"
+
+    def test_retrieving_a_range(self):
+        spell_component = self.spell_components.get_range("SpellRangeTouch")
+        assert spell_component.name == "SpellRangeTouch"
+
+    def test_retrieving_a_shape(self):
+        spell_component = self.spell_components.get_shape("Arrow")
+        assert spell_component.name == "Arrow"
+
+    def test_retrieving_a_modifier(self):
+        spell_component = self.spell_components.get_modifier("RangeDistance")
+        assert spell_component.name == "RangeDistance"
 
     def test_exception_when_retrieving_a_nonexistant_component_name(self):
         with pytest.raises(IndexError):
-            self.spell_components.get_component(Element, "NonExistant")
+            self.spell_components.get_element("NonExistant")
 
-    def test_retrieve_list_of_components_by_type(self):
-        def retrieve_component_type(comp_type: SpellComponent) -> list[SpellComponent]:
-            return self.spell_components.get_components_by_type(comp_type)
-
-        elements = retrieve_component_type(Element)
-        assert elements
-
-        ranges = retrieve_component_type(Range)
-        assert ranges
-
-        shapes = retrieve_component_type(Shape)
-        assert shapes
-
-        modifiers = retrieve_component_type(Modifier)
-        assert modifiers
-
-    def test_retrieve_list_of_components_by_name(self):
-        spell_component = self.spell_components.get_components_by_name("Combustion")
-        assert spell_component
-        assert spell_component[0].name == "Combustion"
+    def test_customizing_component(self):
+        spell_component = self.spell_components.get_range("SpellRange")
+        spell_component.customize(100)
+        assert spell_component.dc == 60
 
 
 class TestSpell:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
+        test_data = load_data("kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_creating_spell(self):
@@ -64,7 +55,7 @@ class TestSpell:
 
     def test_adding_components_to_spell(self):
         fireball = Spell("Fireball")
-        spell_element = self.spell_components.get_component(Element, "Combustion")
+        spell_element = self.spell_components.get_element("Combustion")
         fireball.add_component(spell_element)
         assert len(fireball.components) == 1
         assert fireball.dc != 0
@@ -73,11 +64,11 @@ class TestSpell:
 class TestSpellBook:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
+        test_data = load_data("kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
         cls.test_spell = Spell("Fireball")
-        spell_element = cls.spell_components.get_component(Element, "Combustion")
+        spell_element = cls.spell_components.get_element("Combustion")
         cls.test_spell.add_component(spell_element)
 
     def setup_method(self):
@@ -116,11 +107,16 @@ class TestSpellBook:
         post_removal_spell_list = self.spellbook.spell_list()
         assert not post_removal_spell_list
 
+    def test_exception_when_adding_two_spells_with_same_name(self):
+        with pytest.raises(ValueError):
+            self.spellbook.add_spell(self.test_spell)
+            self.spellbook.add_spell(self.test_spell)
+
 
 class TestCalc:
 
     test_cases = [
-        (f"1+2", 3),
+        ("1+2", 3),
         ("3+4+5", 12),
         ("7-6", 1),
         ("10-8-9", -7),

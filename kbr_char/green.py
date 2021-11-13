@@ -3,7 +3,7 @@ import json
 import operator
 from loguru import logger
 from _ast import Constant, operator as op_type
-from typing import Any
+from typing import Any, Mapping, Optional, Sequence
 from dataclasses import dataclass, field
 
 
@@ -45,8 +45,8 @@ class SpellComponent:
     name: str
     x: int
     formula: str
-    units: str = None
-    desc: str = None
+    units: Optional[str] = None
+    desc: Optional[str] = None
 
     @property
     def dc(self) -> int:
@@ -55,9 +55,6 @@ class SpellComponent:
 
     def customize(self, x: int):
         self.x = x
-
-    def __str__(self):
-        return self.name
 
 
 class Element(SpellComponent):
@@ -76,7 +73,7 @@ class Modifier(SpellComponent):
     ...
 
 
-def load_data(filepath: str) -> dict:
+def load_data(filepath: str) -> Mapping:
 
     with open(filepath) as file_object:
         file_content = file_object.read()
@@ -89,36 +86,29 @@ def load_data(filepath: str) -> dict:
 @dataclass
 class SpellComponentCollection:
     # Remember that order will determine arg input. Keep init_data 1st.
-    init_data: dict[str, str] = field(default_factory=dict)
-    components: list[SpellComponent] = field(default_factory=list)
+    init_data: Mapping = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        elements = [Element(**x) for x in self.init_data["Elements"]]
-        ranges = [Range(**x) for x in self.init_data["Range"]]
-        shapes = [Shape(**x) for x in self.init_data["Shape"]]
-        modifiers = [Modifier(**x) for x in self.init_data["Modifiers"]]
+        self.elements = [Element(**x) for x in self.init_data["Elements"]]
+        self.ranges = [Range(**x) for x in self.init_data["Range"]]
+        self.shapes = [Shape(**x) for x in self.init_data["Shape"]]
+        self.modifiers = [Modifier(**x) for x in self.init_data["Modifiers"]]
 
-        self.components = elements + ranges + shapes + modifiers
-
-    def get_component(
-        self, component_type: SpellComponent, name: str
-    ) -> SpellComponent:
-        filtered = [
-            x
-            for x in self.components
-            if isinstance(x, component_type) and x.name.lower() == name.lower()
-        ]
-        return filtered[0]
-
-    def get_components_by_type(
-        self, component_type: SpellComponent
-    ) -> list[SpellComponent]:
-        filtered = [x for x in self.components if isinstance(x, component_type)]
-        return filtered
-
-    def get_components_by_name(self, name: str) -> list[SpellComponent]:
-        filtered = [x for x in self.components if x.name.lower() == name.lower()]
-        return filtered
+    def get_element(self, name: str) -> Element:
+        filtered_elements = [e for e in self.elements if e.name == name]
+        return filtered_elements[0]
+    
+    def get_range(self, name: str) -> Range:
+        filtered_elements = [r for r in self.ranges if r.name == name]
+        return filtered_elements[0]
+    
+    def get_shape(self, name: str) -> Shape:
+        filtered_elements = [s for s in self.shapes if s.name == name]
+        return filtered_elements[0]
+    
+    def get_modifier(self, name: str) -> Modifier:
+        filtered_elements = [m for m in self.modifiers if m.name == name]
+        return filtered_elements[0]
 
 
 @dataclass
@@ -164,34 +154,35 @@ class SpellBook:
         return filtered[0]
 
 
-if __name__ == "__main__":
-    # Usage example
+# if __name__ == "__main__":
+#     # Usage example
 
-    # Data setup
-    test_data_load = load_data("green.json")
-    spell_components = SpellComponentCollection(test_data_load)
+#     # Data setup
+#     test_data_load = load_data("kbr_char/green.json")
+#     spell_components = SpellComponentCollection(test_data_load)
+#     logger.info(spell_components)
 
-    # Spell Construction
-    fireball = Spell("Fireball")
+#     # Spell Construction
+#     fireball = Spell("Fireball")
 
-    spell_element = spell_components.get_component(Element, "Combustion")
-    spell_range = spell_components.get_component(Range, "SpellRange")
-    spell_shape = spell_components.get_component(Shape, "Arrow")
+#     spell_element = spell_components.get_element("Combustion")
+#     spell_range = spell_components.get_range("SpellRange")
+#     spell_shape = spell_components.get_shape("Arrow")
 
-    spell_range.customize(100)  # Change range to 100 ft
+#     spell_range.customize(100)  # Change range to 100 ft
 
-    fireball.add_component(spell_element)
-    fireball.add_component(spell_range)
-    fireball.add_component(spell_shape)
+#     fireball.add_component(spell_element)
+#     fireball.add_component(spell_range)
+#     fireball.add_component(spell_shape)
 
-    # SpellBook Construction
-    my_spellbook = SpellBook("Exodius")
-    my_spellbook.add_spell(fireball)
+#     # SpellBook Construction
+#     my_spellbook = SpellBook("Exodius")
+#     my_spellbook.add_spell(fireball)
 
-    # Demo Output
-    logger.debug(my_spellbook.spell_list())
-    logger.debug(my_spellbook.get_spell("Fireball"))
-    logger.debug(my_spellbook.get_spell("Fireball").name)
-    logger.debug(my_spellbook.get_spell("Fireball").dc)
+#     # Demo Output
+#     logger.debug(my_spellbook.spell_list())
+#     logger.debug(my_spellbook.get_spell("Fireball"))
+#     logger.debug(my_spellbook.get_spell("Fireball").name)
+#     logger.debug(my_spellbook.get_spell("Fireball").dc)
 
-    # To test this code out, run: pytest tests/test_green.py
+#     # To test this code out, run: pytest tests/test_green.py

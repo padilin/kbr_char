@@ -88,8 +88,8 @@ def load_data(filepath: str) -> dict:
 @dataclass
 class SpellComponentCollection:
     # Remember that order will determine arg input. Keep init_data 1st.
-    init_data: list[SpellComponent] = field(default_factory=list)
-    components: dict[str, str] = field(default_factory=dict)
+    init_data: dict[str, str] = field(default_factory=dict)
+    components: list[SpellComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         elements = [Element(**x) for x in self.init_data["Elements"]]

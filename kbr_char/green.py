@@ -138,7 +138,7 @@ class SpellBook:
     name: str
     spells: list[Spell] = field(default_factory=list)
 
-    def spell_list(self) -> list[Spell]:
+    def spell_list(self) -> list[str]:
         return [spell.name for spell in self.spells]
 
     def detailed_spell_list(self) -> list[Spell]:

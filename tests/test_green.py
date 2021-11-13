@@ -18,7 +18,7 @@ from kbr_char.green import (
 class TestSpellComponentCollections:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("kbr_char/green.json")
+        test_data = load_data("../kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_retrieving_a_component(self):
@@ -54,7 +54,7 @@ class TestSpellComponentCollections:
 class TestSpell:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("kbr_char/green.json")
+        test_data = load_data("../kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_creating_spell(self):
@@ -73,7 +73,7 @@ class TestSpell:
 class TestSpellBook:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("kbr_char/green.json")
+        test_data = load_data("../kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
         cls.test_spell = Spell("Fireball")

@@ -1,5 +1,3 @@
-import operator
-
 import pytest
 from kbr_char.green import (
     load_data,
@@ -16,28 +14,16 @@ class TestSpellComponentCollections:
         test_data = load_data("kbr_char/green.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
-    def test_retrieving_an_element(self):
-        spell_component = self.spell_components.get_element("Combustion")
+    def test_retrieving_a_component(self):
+        spell_component = self.spell_components.get_component("Combustion")
         assert spell_component.name == "Combustion"
-
-    def test_retrieving_a_range(self):
-        spell_component = self.spell_components.get_range("SpellRangeTouch")
-        assert spell_component.name == "SpellRangeTouch"
-
-    def test_retrieving_a_shape(self):
-        spell_component = self.spell_components.get_shape("Arrow")
-        assert spell_component.name == "Arrow"
-
-    def test_retrieving_a_modifier(self):
-        spell_component = self.spell_components.get_modifier("RangeDistance")
-        assert spell_component.name == "RangeDistance"
 
     def test_exception_when_retrieving_a_nonexistant_component_name(self):
         with pytest.raises(IndexError):
-            self.spell_components.get_element("NonExistant")
+            self.spell_components.get_component("NonExistant")
 
     def test_customizing_component(self):
-        spell_component = self.spell_components.get_range("SpellRange")
+        spell_component = self.spell_components.get_component("SpellRange")
         spell_component.customize(100)
         assert spell_component.dc == 60
 
@@ -55,7 +41,7 @@ class TestSpell:
 
     def test_adding_components_to_spell(self):
         fireball = Spell("Fireball")
-        spell_element = self.spell_components.get_element("Combustion")
+        spell_element = self.spell_components.get_component("Combustion")
         fireball.add_component(spell_element)
         assert len(fireball.components) == 1
         assert fireball.dc != 0
@@ -68,7 +54,7 @@ class TestSpellBook:
         cls.spell_components = SpellComponentCollection(test_data)
 
         cls.test_spell = Spell("Fireball")
-        spell_element = cls.spell_components.get_element("Combustion")
+        spell_element = cls.spell_components.get_component("Combustion")
         cls.test_spell.add_component(spell_element)
 
     def setup_method(self):
@@ -125,7 +111,7 @@ class TestCalc:
         ("19/5", 3),
         ("1000/20/2", 25),
         ("2**3", 8),
-        ("10-7+(3*5)/(10**2)", 3)
+        ("10-7+(3*5)/(10**2)", 3),
     ]
 
     @pytest.mark.parametrize("test_input,expected", test_cases)

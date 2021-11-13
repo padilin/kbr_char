@@ -18,6 +18,7 @@ class Calc(ast.NodeVisitor):
             ast.Mult: operator.mul,
             ast.Div: operator.truediv,
             ast.Invert: operator.neg,
+            ast.Pow: operator.pow,
         }
         return op_map[type(op)]
 

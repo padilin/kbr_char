@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import ast
 import operator
@@ -221,7 +222,7 @@ class SpellFactory:
 if __name__ == "__main__":
     print("Testing loading spells from json")
     test_1 = None
-    with open('spells.json', 'r') as f:
+    with open('kbr_char/spells.json', 'r') as f:
         test_1 = json.load(f)
     Codex = SpellFactory(test_1)
     print(f"Loaded json: {Codex=}")

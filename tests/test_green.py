@@ -1,4 +1,4 @@
-import operator
+from __future__ import annotations
 
 import pytest
 from kbr_char.green import (

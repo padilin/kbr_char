@@ -1,3 +1,5 @@
+import operator
+
 import pytest
 from kbr_char.green import (
     Modifier,
@@ -9,6 +11,7 @@ from kbr_char.green import (
     Shape,
     SpellComponent,
     SpellBook,
+    Calc,
 )
 
 
@@ -112,3 +115,23 @@ class TestSpellBook:
         self.spellbook.remove_spell("Fireball")
         post_removal_spell_list = self.spellbook.spell_list()
         assert not post_removal_spell_list
+
+
+class TestCalc:
+
+    test_cases = [
+        (f"1+2", 3),
+        ("3+4+5", 12),
+        ("7-6", 1),
+        ("10-8-9", -7),
+        ("5*5", 25),
+        ("100*10*3", 3000),
+        ("19/5", 3),
+        ("1000/20/2", 25),
+        ("2**3", 8),
+        ("10-7+(3*5)/(10**2)", 3)
+    ]
+
+    @pytest.mark.parametrize("test_input,expected", test_cases)
+    def test_formula(self, test_input, expected):
+        assert int(Calc.evaluate(test_input)) == expected

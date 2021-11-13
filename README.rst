@@ -1,13 +1,15 @@
 ========
 kbr_char
 ========
+.. image:: https://github.com/padilin/kbr_char/workflows/Lint%20Code%20Base/badge.svg
+        :target: https://github.com/marketplace/actions/super-linter
+
 .. image:: https://img.shields.io/travis/padilin/kbr_char.svg
         :target: https://travis-ci.com/padilin/kbr_char
 
 .. image:: https://readthedocs.org/projects/kbr-char/badge/?version=latest
         :target: https://kbr-char.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
-
 
 .. image:: https://pyup.io/repos/github/padilin/kbr_char/shield.svg
      :target: https://pyup.io/repos/github/padilin/kbr_char/

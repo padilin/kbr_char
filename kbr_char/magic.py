@@ -1,3 +1,5 @@
+from __future__ import annotations  # For using | with type hints
+
 import ast
 import json
 import operator

@@ -1,4 +1,5 @@
 import operator
+import os.path
 from typing import Type
 
 import pytest
@@ -14,6 +15,17 @@ from kbr_char.magic import (
     SpellBook,
     Calc,
 )
+
+
+json_file = None
+if os.path.isfile("../kbr_char/magic.json"):
+    json_file = "../kbr_char/magic.json"
+elif os.path.isfile("../../kbr_char/magic.json"):
+    json_file = "../../kbr_char/magic.json"
+elif os.path.isfile("magic.json"):
+    json_file = "magic.json"
+else:
+    raise FileNotFoundError("Test data json not found.")
 
 
 class TestSpellComponentCollections:

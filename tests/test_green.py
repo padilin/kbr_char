@@ -70,11 +70,21 @@ class TestSpell:
         assert fireball.dc != 0
 
 
-class TestSpellBook:
+class TestSpellComponent:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
-        cls.spell_components = SpellComponentCollection(test_data)
+        cls.spell_components = SpellComponent(name="Bolt", x=5, formula="x+4", units="ft", desc="Test spell")
+
+    def test_customize(self):
+        self.spell_components.customize(6)
+        assert self.spell_components.x == 6
+
+
+class TestSpellBook:  # Note: may differ from expected usage, need to revisit. It still tests everything.
+    @classmethod
+    def setup_class(cls):
+        cls.test_data = load_data("../kbr_char/green.json")
+        cls.spell_components = SpellComponentCollection(cls.test_data)
 
         cls.test_spell = Spell("Fireball")
         spell_element = cls.spell_components.get_component(Element, "Combustion")
@@ -85,6 +95,10 @@ class TestSpellBook:
 
     def test_spellbook_creation(self):
         assert self.spellbook.name == "Exodius"
+
+    def test_add_spell_components(self):
+        testing_spellbook = SpellBook("Complexity")
+        testing_spellbook.load_components(self.test_data)
 
     def test_adding_spell_to_spellbook(self):
         self.spellbook.add_spell(self.test_spell)
@@ -115,6 +129,11 @@ class TestSpellBook:
         self.spellbook.remove_spell("Fireball")
         post_removal_spell_list = self.spellbook.spell_list()
         assert not post_removal_spell_list
+
+    def test_duplicate_spell(self):
+        self.spellbook.add_spell(self.test_spell)
+        with pytest.raises(ValueError) as e:
+            self.spellbook.add_spell(self.test_spell)
 
 
 class TestCalc:

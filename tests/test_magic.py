@@ -18,7 +18,9 @@ from kbr_char.magic import (
 
 
 json_file = None
-if os.path.isfile("../kbr_char/magic.json"):
+if os.path.isfile("kbr_char/magic.json"):
+    json_file = "kbr_char/magic.json"
+elif os.path.isfile("../kbr_char/magic.json"):
     json_file = "../kbr_char/magic.json"
 elif os.path.isfile("../../kbr_char/magic.json"):
     json_file = "../../kbr_char/magic.json"
@@ -31,7 +33,7 @@ else:
 class TestSpellComponentCollections:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/magic.json")
+        test_data = load_data(json_file)
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_retrieving_a_component(self):
@@ -67,7 +69,7 @@ class TestSpellComponentCollections:
 class TestSpell:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/magic.json")
+        test_data = load_data(json_file)
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_creating_spell(self):
@@ -96,7 +98,7 @@ class TestSpellComponent:
 class TestSpellBook:  # Note: may differ from expected usage, need to revisit. It still tests everything.
     @classmethod
     def setup_class(cls):
-        cls.test_data = load_data("../kbr_char/magic.json")
+        cls.test_data = load_data(json_file)
         cls.spell_components = SpellComponentCollection(cls.test_data)
 
         cls.test_spell = Spell("Fireball")

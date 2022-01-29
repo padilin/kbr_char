@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # Usage example
 
     # Data setup
-    test_data_load = load_data("green.json")
+    test_data_load = load_data("magic.json")
     MySpellBook = SpellBook("My Spell Book")
     MySpellBook.load_components(test_data_load)
 
@@ -198,4 +198,4 @@ if __name__ == "__main__":
     logger.debug(MySpellBook.get_spell("Fireball").name)
     logger.debug(MySpellBook.get_spell("Fireball").dc)
 
-    # To test this code out, run: pytest tests/test_green.py
+    # To test this code out, run: pytest tests/test_magic.py

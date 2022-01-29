@@ -1,7 +1,8 @@
 import operator
+from typing import Type
 
 import pytest
-from kbr_char.green import (
+from kbr_char.magic import (
     Modifier,
     load_data,
     SpellComponentCollection,
@@ -18,7 +19,7 @@ from kbr_char.green import (
 class TestSpellComponentCollections:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
+        test_data = load_data("../kbr_char/magic.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_retrieving_a_component(self):
@@ -30,7 +31,7 @@ class TestSpellComponentCollections:
             self.spell_components.get_component(Element, "NonExistant")
 
     def test_retrieve_list_of_components_by_type(self):
-        def retrieve_component_type(comp_type: SpellComponent) -> list[SpellComponent]:
+        def retrieve_component_type(comp_type: Type[SpellComponent]) -> list[SpellComponent]:
             return self.spell_components.get_components_by_type(comp_type)
 
         elements = retrieve_component_type(Element)
@@ -54,7 +55,7 @@ class TestSpellComponentCollections:
 class TestSpell:
     @classmethod
     def setup_class(cls):
-        test_data = load_data("../kbr_char/green.json")
+        test_data = load_data("../kbr_char/magic.json")
         cls.spell_components = SpellComponentCollection(test_data)
 
     def test_creating_spell(self):
@@ -83,7 +84,7 @@ class TestSpellComponent:
 class TestSpellBook:  # Note: may differ from expected usage, need to revisit. It still tests everything.
     @classmethod
     def setup_class(cls):
-        cls.test_data = load_data("../kbr_char/green.json")
+        cls.test_data = load_data("../kbr_char/magic.json")
         cls.spell_components = SpellComponentCollection(cls.test_data)
 
         cls.test_spell = Spell("Fireball")

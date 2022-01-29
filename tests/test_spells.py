@@ -5,7 +5,7 @@ from kbr_char.spells import SpellFactory
 
 class TestSpells:
     def setup_method(self):
-        with open("kbr_char/spells.json") as f:
+        with open("../kbr_char/spells.json") as f:
             test_config = json.load(f)
         self.codex = SpellFactory(test_config)
         self.save_file = "codex_test"

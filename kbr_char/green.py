@@ -3,7 +3,7 @@ import json
 import operator
 from loguru import logger
 from _ast import Constant, operator as op_type
-from typing import Any
+from typing import Any, Type, List, Optional
 from dataclasses import dataclass, field
 
 
@@ -89,19 +89,19 @@ def load_data(filepath: str) -> dict:
 @dataclass
 class SpellComponentCollection:
     # Remember that order will determine arg input. Keep init_data 1st.
-    init_data: dict[str, str] = field(default_factory=dict)
+    init_data: dict[str, list[dict[str, str | int]]] = field(default_factory=dict)
     components: list[SpellComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        elements = [Element(**x) for x in self.init_data["Elements"]]
-        ranges = [Range(**x) for x in self.init_data["Range"]]
-        shapes = [Shape(**x) for x in self.init_data["Shape"]]
-        modifiers = [Modifier(**x) for x in self.init_data["Modifiers"]]
+        elements: list[Element] = [Element(**x) for x in self.init_data["Elements"]]
+        ranges: list[Range] = [Range(**x) for x in self.init_data["Range"]]
+        shapes: list[Shape] = [Shape(**x) for x in self.init_data["Shape"]]
+        modifiers: list[Modifier] = [Modifier(**x) for x in self.init_data["Modifiers"]]
 
-        self.components = elements + ranges + shapes + modifiers
+        self.components = elements + ranges + shapes + modifiers  # Typehint changes after first list added?
 
     def get_component(
-        self, component_type: SpellComponent, name: str
+        self, component_type: Type[SpellComponent], name: str
     ) -> SpellComponent:
         filtered = [
             x
@@ -111,7 +111,7 @@ class SpellComponentCollection:
         return filtered[0]
 
     def get_components_by_type(
-        self, component_type: SpellComponent
+        self, component_type: Type[SpellComponent]
     ) -> list[SpellComponent]:
         filtered = [x for x in self.components if isinstance(x, component_type)]
         return filtered
@@ -138,6 +138,7 @@ class Spell:
 class SpellBook:
     name: str
     spells: list[Spell] = field(default_factory=list)
+    components: Optional[SpellComponentCollection] = None
 
     def spell_list(self) -> list[str]:
         return [spell.name for spell in self.spells]
@@ -163,20 +164,24 @@ class SpellBook:
         filtered = [spell for spell in self.spells if spell.name == spellname]
         return filtered[0]
 
+    def load_components(self, data: dict[str, list[dict[str, str | int]]]):
+        self.components = SpellComponentCollection(data)
+
 
 if __name__ == "__main__":
     # Usage example
 
     # Data setup
     test_data_load = load_data("green.json")
-    spell_components = SpellComponentCollection(test_data_load)
+    MySpellBook = SpellBook("My Spell Book")
+    MySpellBook.load_components(test_data_load)
 
     # Spell Construction
     fireball = Spell("Fireball")
 
-    spell_element = spell_components.get_component(Element, "Combustion")
-    spell_range = spell_components.get_component(Range, "SpellRange")
-    spell_shape = spell_components.get_component(Shape, "Arrow")
+    spell_element = MySpellBook.components.get_component(Element, "Combustion")
+    spell_range = MySpellBook.components.get_component(Range, "SpellRange")
+    spell_shape = MySpellBook.components.get_component(Shape, "Arrow")
 
     spell_range.customize(100)  # Change range to 100 ft
 
@@ -185,13 +190,12 @@ if __name__ == "__main__":
     fireball.add_component(spell_shape)
 
     # SpellBook Construction
-    my_spellbook = SpellBook("Exodius")
-    my_spellbook.add_spell(fireball)
+    MySpellBook.add_spell(fireball)
 
     # Demo Output
-    logger.debug(my_spellbook.spell_list())
-    logger.debug(my_spellbook.get_spell("Fireball"))
-    logger.debug(my_spellbook.get_spell("Fireball").name)
-    logger.debug(my_spellbook.get_spell("Fireball").dc)
+    logger.debug(MySpellBook.spell_list())
+    logger.debug(MySpellBook.get_spell("Fireball"))
+    logger.debug(MySpellBook.get_spell("Fireball").name)
+    logger.debug(MySpellBook.get_spell("Fireball").dc)
 
     # To test this code out, run: pytest tests/test_green.py

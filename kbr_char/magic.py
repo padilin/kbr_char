@@ -3,10 +3,12 @@ from __future__ import annotations  # For using | with type hints
 import ast
 import json
 import operator
-from loguru import logger
-from _ast import Constant, operator as op_type
-from typing import Any, Type, List, Optional
+from _ast import Constant
+from _ast import operator as op_type
 from dataclasses import dataclass, field
+from typing import Any, Optional, Type
+
+from loguru import logger
 
 
 class Calc(ast.NodeVisitor):
@@ -47,8 +49,8 @@ class SpellComponent:
     name: str
     x: int
     formula: str
-    units: str = None
-    desc: str = None
+    units: Optional[str] = None
+    desc: Optional[str] = None
 
     @property
     def dc(self) -> int:
@@ -100,11 +102,20 @@ class SpellComponentCollection:
         shapes: list[Shape] = [Shape(**x) for x in self.init_data["Shape"]]
         modifiers: list[Modifier] = [Modifier(**x) for x in self.init_data["Modifiers"]]
 
-        self.components = elements + ranges + shapes + modifiers  # Typehint changes after first list added?
+        for (
+            item_elem
+        ) in (
+            elements
+        ):  # TODO: Find a better way. Typing changes after first item is appended...
+            self.components.append(item_elem)
+        for item_range in ranges:
+            self.components.append(item_range)
+        for item_shape in shapes:
+            self.components.append(item_shape)
+        for item_mod in modifiers:
+            self.components.append(item_mod)
 
-    def get_component(
-        self, component_type: Type[SpellComponent], name: str
-    ) -> SpellComponent:
+    def get(self, component_type: Type[SpellComponent], name: str) -> SpellComponent:
         filtered = [
             x
             for x in self.components
@@ -112,13 +123,11 @@ class SpellComponentCollection:
         ]
         return filtered[0]
 
-    def get_components_by_type(
-        self, component_type: Type[SpellComponent]
-    ) -> list[SpellComponent]:
+    def get_by_type(self, component_type: Type[SpellComponent]) -> list[SpellComponent]:
         filtered = [x for x in self.components if isinstance(x, component_type)]
         return filtered
 
-    def get_components_by_name(self, name: str) -> list[SpellComponent]:
+    def get_by_name(self, name: str) -> list[SpellComponent]:
         filtered = [x for x in self.components if x.name.lower() == name.lower()]
         return filtered
 
@@ -181,9 +190,9 @@ if __name__ == "__main__":
     # Spell Construction
     fireball = Spell("Fireball")
 
-    spell_element = MySpellBook.components.get_component(Element, "Combustion")
-    spell_range = MySpellBook.components.get_component(Range, "SpellRange")
-    spell_shape = MySpellBook.components.get_component(Shape, "Arrow")
+    spell_element = MySpellBook.components.get(Element, "Combustion")
+    spell_range = MySpellBook.components.get(Range, "SpellRange")
+    spell_shape = MySpellBook.components.get(Shape, "Arrow")
 
     spell_range.customize(100)  # Change range to 100 ft
 
@@ -195,9 +204,9 @@ if __name__ == "__main__":
     MySpellBook.add_spell(fireball)
 
     # Demo Output
-    logger.debug(MySpellBook.spell_list())
-    logger.debug(MySpellBook.get_spell("Fireball"))
-    logger.debug(MySpellBook.get_spell("Fireball").name)
-    logger.debug(MySpellBook.get_spell("Fireball").dc)
+    logger.debug(f"Spells in {MySpellBook}: {MySpellBook.spell_list()}")
+    logger.debug(f"Spell: {MySpellBook.get_spell('Fireball')}")
+    logger.debug(f"Spell Name: {MySpellBook.get_spell('Fireball').name}")
+    logger.debug(f"Spell DC: {MySpellBook.get_spell('Fireball').dc}")
 
     # To test this code out, run: pytest tests/test_magic.py

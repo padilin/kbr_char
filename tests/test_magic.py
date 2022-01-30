@@ -15,7 +15,6 @@ from kbr_char.magic import (
     load_data,
 )
 
-
 json_file = None
 if os.path.isfile("kbr_char/magic.json"):
     json_file = "kbr_char/magic.json"
@@ -47,7 +46,7 @@ class TestSpellComponentCollections:
         def retrieve_component_type(
             comp_type: Type[SpellComponent],
         ) -> list[SpellComponent]:
-            return self.spell_components.get_by_type(comp_type)
+            return self.spell_components.get_by_type(comp_type)  # type: ignore  # Mypy being weird
 
         elements = retrieve_component_type(Element)
         assert elements

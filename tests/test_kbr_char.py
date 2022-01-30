@@ -3,10 +3,7 @@
 """Tests for `kbr_char` package."""
 
 import pytest
-
 from click.testing import CliRunner
-
-from kbr_char import kbr_char
 from kbr_char import cli
 
 

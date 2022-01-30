@@ -183,8 +183,8 @@ if __name__ == "__main__":
     # Usage example
 
     # Data setup
-    test_data_load = load_data("magic.json")
-    MySpellBook = SpellBook("My Spell Book")
+    test_data_load: dict = load_data("magic.json")
+    MySpellBook: SpellBook = SpellBook("My Spell Book")
     MySpellBook.load_components(test_data_load)
 
     # Spell Construction

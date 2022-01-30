@@ -1,5 +1,6 @@
 """Console script for kbr_char."""
 import sys
+
 import click
 
 

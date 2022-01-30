@@ -1,5 +1,4 @@
 import os.path
-from typing import Type
 
 import pytest
 from kbr_char.magic import (

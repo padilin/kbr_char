@@ -81,7 +81,6 @@ class Modifier(SpellComponent):
 
 
 def load_data(filepath: str) -> dict:
-
     with open(filepath) as file_object:
         file_content = file_object.read()
 
@@ -93,27 +92,50 @@ def load_data(filepath: str) -> dict:
 @dataclass
 class SpellComponentCollection:
     # Remember that order will determine arg input. Keep init_data 1st.
-    init_data: dict[str, list[dict[str, str | int]]] = field(default_factory=dict)
+    init_data: dict[str, list[dict[str, Any]]] = field(
+        default_factory=dict
+    )  # Any due to some types require int
     components: list[SpellComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        elements: list[Element] = [Element(**x) for x in self.init_data["Elements"]]
-        ranges: list[Range] = [Range(**x) for x in self.init_data["Range"]]
-        shapes: list[Shape] = [Shape(**x) for x in self.init_data["Shape"]]
-        modifiers: list[Modifier] = [Modifier(**x) for x in self.init_data["Modifiers"]]
-
-        for (
-            item_elem
-        ) in (
-            elements
-        ):  # TODO: Find a better way. Typing changes after first item is appended...
-            self.components.append(item_elem)
-        for item_range in ranges:
-            self.components.append(item_range)
-        for item_shape in shapes:
-            self.components.append(item_shape)
-        for item_mod in modifiers:
-            self.components.append(item_mod)
+        for component in self.init_data[
+            "Elements"
+        ]:  # TODO: reduce duplication pythonic way
+            self.components.append(
+                Element(
+                    name=component["name"],
+                    x=component["x"],
+                    desc=component["desc"],
+                    formula=component["formula"],
+                )
+            )
+        for component in self.init_data["Range"]:
+            self.components.append(
+                Range(
+                    name=component["name"],
+                    x=component["x"],
+                    desc=component["desc"],
+                    formula=component["formula"],
+                )
+            )
+        for component in self.init_data["Shape"]:
+            self.components.append(
+                Shape(
+                    name=component["name"],
+                    x=component["x"],
+                    desc=component["desc"],
+                    formula=component["formula"],
+                )
+            )
+        for component in self.init_data["Modifiers"]:
+            self.components.append(
+                Modifier(
+                    name=component["name"],
+                    x=component["x"],
+                    desc=component["desc"],
+                    formula=component["formula"],
+                )
+            )
 
     def get(self, component_type: Type[SpellComponent], name: str) -> SpellComponent:
         filtered = [
@@ -149,7 +171,7 @@ class Spell:
 class SpellBook:
     name: str
     spells: list[Spell] = field(default_factory=list)
-    components: Optional[SpellComponentCollection] = None
+    components: SpellComponentCollection = None
 
     def spell_list(self) -> list[str]:
         return [spell.name for spell in self.spells]

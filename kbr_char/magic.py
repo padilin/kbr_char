@@ -98,6 +98,10 @@ class SpellComponentCollection:
     components: list[SpellComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
+        if self.init_data:
+            self.load_init_data()
+
+    def load_init_data(self):
         for component in self.init_data[
             "Elements"
         ]:  # TODO: reduce duplication pythonic way
@@ -171,7 +175,9 @@ class Spell:
 class SpellBook:
     name: str
     spells: list[Spell] = field(default_factory=list)
-    components: SpellComponentCollection = None
+    components: SpellComponentCollection = field(
+        default_factory=SpellComponentCollection
+    )
 
     def spell_list(self) -> list[str]:
         return [spell.name for spell in self.spells]
@@ -198,7 +204,8 @@ class SpellBook:
         return filtered[0]
 
     def load_components(self, data: dict[str, list[dict[str, str | int]]]):
-        self.components = SpellComponentCollection(data)
+        self.components.init_data = data
+        self.components.load_init_data()  # TODO: Find better way, perhaps spellbook must have json?
 
 
 if __name__ == "__main__":

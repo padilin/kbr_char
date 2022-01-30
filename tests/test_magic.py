@@ -43,21 +43,16 @@ class TestSpellComponentCollections:
             self.spell_components.get(Element, "NonExistant")
 
     def test_retrieve_list_of_components_by_type(self):
-        def retrieve_component_type(
-            comp_type: Type[SpellComponent],
-        ) -> list[SpellComponent]:
-            return self.spell_components.get_by_type(comp_type)  # type: ignore  # Mypy being weird
-
-        elements = retrieve_component_type(Element)
+        elements = self.spell_components.get_by_type(Element)
         assert elements
 
-        ranges = retrieve_component_type(Range)
+        ranges = self.spell_components.get_by_type(Range)
         assert ranges
 
-        shapes = retrieve_component_type(Shape)
+        shapes = self.spell_components.get_by_type(Shape)
         assert shapes
 
-        modifiers = retrieve_component_type(Modifier)
+        modifiers = self.spell_components.get_by_type(Modifier)
         assert modifiers
 
     def test_retrieve_list_of_components_by_name(self):
